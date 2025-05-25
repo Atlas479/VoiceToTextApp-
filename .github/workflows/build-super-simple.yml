@@ -1,0 +1,39 @@
+name: 超简化构建APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: 设置JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 设置Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 33
+        
+    - name: 给gradlew权限
+      run: chmod +x gradlew
+      
+    - name: 重新生成gradle wrapper
+      run: |
+        rm -rf gradle/wrapper/*
+        ./gradlew wrapper --gradle-version=8.2
+        
+    - name: 构建APK
+      run: ./gradlew assembleDebug --no-daemon
+      
+    - name: 上传APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: 录音转文字-超简化版
+        path: app/build/outputs/apk/debug/*.apk 
