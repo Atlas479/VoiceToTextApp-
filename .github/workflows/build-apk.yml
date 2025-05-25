@@ -1,0 +1,95 @@
+name: 构建Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      
+    - name: 设置JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: 设置Android SDK
+      uses: android-actions/setup-android@v2
+      
+    - name: 缓存Gradle依赖
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: 给gradlew执行权限
+      run: chmod +x gradlew
+      
+    - name: 构建Debug APK
+      run: ./gradlew assembleDebug
+      
+    - name: 构建Release APK
+      run: ./gradlew assembleRelease
+      continue-on-error: true
+      
+    - name: 上传Debug APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: 课程录音转文字-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+        
+    - name: 上传Release APK
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: 课程录音转文字-release
+        path: app/build/outputs/apk/release/app-release.apk
+        
+    - name: 创建Release
+      if: github.ref == 'refs/heads/main' && success()
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: 课程录音转文字 v1.0.${{ github.run_number }}
+        body: |
+          ## 📱 课程录音转文字应用
+          
+          ### 🎯 主要功能
+          - ✅ 手动控制录音开始、暂停、继续、停止
+          - ✅ 自定义文件名，每次录音单独保存
+          - ✅ 实时语音转文字，无需网络
+          - ✅ 内置文件管理，支持查看、分享、导出
+          
+          ### 📲 安装方法
+          1. 下载下方的APK文件
+          2. 传输到手机
+          3. 开启"未知来源"安装
+          4. 点击APK文件安装
+          
+          ### 📋 系统要求
+          - Android 7.0 (API 24) 及以上
+          - 麦克风和存储权限
+          
+          ### 🔄 更新内容
+          - 自动构建版本 ${{ github.run_number }}
+          - 修复已知问题
+          - 优化用户体验
+        files: |
+          app/build/outputs/apk/debug/app-debug.apk
+          app/build/outputs/apk/release/app-release.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

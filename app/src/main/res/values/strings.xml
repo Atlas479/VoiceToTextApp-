@@ -1,0 +1,97 @@
+<resources>
+    <string name="app_name">课程录音转文字</string>
+    
+    <!-- 主界面 -->
+    <string name="start_new_recording">开始新录音</string>
+    <string name="pause_recording">暂停</string>
+    <string name="resume_recording">继续录音</string>
+    <string name="stop_and_save">停止并保存</string>
+    <string name="view_files">查看已保存文件</string>
+    <string name="clear_current_text">清除当前文本</string>
+    <string name="status_ready">准备就绪，点击开始新录音</string>
+    <string name="status_recording">正在录音中...</string>
+    <string name="status_paused">录音已暂停</string>
+    <string name="current_file">当前文件：%s</string>
+    <string name="current_file_none">当前文件：无</string>
+    <string name="recognized_text_placeholder">开始录音后，识别的文字将在这里实时显示...</string>
+    <string name="real_time_text">实时转换文本</string>
+    <string name="selectable_text_hint">可选中复制</string>
+    <string name="auto_save_info">支持暂停继续，每次录音单独保存文件</string>
+    
+    <!-- 文件命名对话框 -->
+    <string name="new_recording_title">新建录音文件</string>
+    <string name="enter_filename_message">请为这次录音命名：</string>
+    <string name="filename_hint">请输入文件名（如：数学课第一章）</string>
+    <string name="default_filename">课程录音_%d</string>
+    <string name="start_recording_btn">开始录音</string>
+    <string name="save_recording_title">保存录音文件</string>
+    <string name="confirm_filename_message">确认文件名：</string>
+    <string name="save_btn">保存</string>
+    <string name="continue_recording_btn">继续录音</string>
+    <string name="please_enter_filename">请输入文件名</string>
+    <string name="recording_saved">录音已保存为：%s</string>
+    
+    <!-- 清除文本对话框 -->
+    <string name="clear_text_title">清除文本</string>
+    <string name="clear_text_message">确定要清除当前显示的文本吗？（不会影响已保存的内容）</string>
+    <string name="clear_btn">清除</string>
+    
+    <!-- 权限相关 -->
+    <string name="permissions_granted">权限已授予，可以开始使用</string>
+    <string name="permissions_required">需要权限才能使用录音功能</string>
+    
+    <!-- 文件管理 -->
+    <string name="file_manager">文件管理</string>
+    <string name="refresh">刷新</string>
+    <string name="clean_old">清理旧文件</string>
+    <string name="file_count">共 %d 个文件</string>
+    <string name="empty_files">暂无文件</string>
+    <string name="empty_files_desc">开始录音后，文件将自动保存在这里</string>
+    
+    <!-- 文件操作 -->
+    <string name="view">查看</string>
+    <string name="share">分享</string>
+    <string name="delete">删除</string>
+    <string name="export">导出</string>
+    <string name="delete_file_title">删除文件</string>
+    <string name="delete_file_message">确定要删除文件 \"%s\" 吗？</string>
+    <string name="clean_old_files_title">清理旧文件</string>
+    <string name="clean_old_files_message">将删除30天前的文件，确定继续吗？</string>
+    <string name="file_deleted">文件已删除</string>
+    <string name="delete_failed">删除失败</string>
+    <string name="file_exported">文件已导出到下载目录</string>
+    <string name="export_failed">导出失败</string>
+    <string name="clean_completed">清理完成</string>
+    <string name="share_subject">课程录音转文字 - %s</string>
+    
+    <!-- 通知 -->
+    <string name="notification_title">课程录音转文字</string>
+    <string name="notification_text_recording">正在录音 - %s</string>
+    <string name="notification_text_paused">已暂停 - %s</string>
+    <string name="notification_channel_name">课程录音服务</string>
+    <string name="notification_channel_desc">课程录音转文字后台服务</string>
+    
+    <!-- 按钮 -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    
+    <!-- 错误信息 -->
+    <string name="error_no_speech_recognizer">设备不支持语音识别</string>
+    <string name="error_permission_denied">权限被拒绝</string>
+    <string name="error_file_save">文件保存失败</string>
+    <string name="error_file_read">文件读取失败</string>
+    
+    <!-- 文件信息 -->
+    <string name="file_size">大小: %s</string>
+    <string name="file_modified">修改: %s</string>
+    <string name="course_name">课程: %s</string>
+    
+    <!-- 文件类型 -->
+    <string name="daily_record">日常记录</string>
+    <string name="course_record">课程录音</string>
+    <string name="unknown_file">未知文件</string>
+    <string name="unnamed_course">未命名课程</string>
+    
+</resources> 
