@@ -26,11 +26,11 @@ jobs:
         echo "/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_PATH
         echo "/usr/local/lib/android/sdk/tools" >> $GITHUB_PATH
         
-    - name: 安装Gradle
+    - name: 安装Gradle 8.2
       run: |
-        wget -q https://services.gradle.org/distributions/gradle-7.6-bin.zip
-        unzip -q gradle-7.6-bin.zip
-        echo "$PWD/gradle-7.6/bin" >> $GITHUB_PATH
+        wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
+        unzip -q gradle-8.2-bin.zip
+        echo "$PWD/gradle-8.2/bin" >> $GITHUB_PATH
         
     - name: 创建local.properties
       run: echo "sdk.dir=/usr/local/lib/android/sdk" > local.properties
