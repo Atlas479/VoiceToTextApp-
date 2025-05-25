@@ -1,0 +1,57 @@
+name: 终极构建APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: 设置Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 30
+        build-tools: 30.0.3
+        
+    - name: 安装Gradle
+      run: |
+        wget https://services.gradle.org/distributions/gradle-7.6-bin.zip
+        unzip -q gradle-7.6-bin.zip
+        export PATH=$PATH:$PWD/gradle-7.6/bin
+        echo "$PWD/gradle-7.6/bin" >> $GITHUB_PATH
+        
+    - name: 创建local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: 验证Gradle安装
+      run: gradle --version
+      
+    - name: 清理项目
+      run: gradle clean
+      
+    - name: 构建Debug APK
+      run: gradle assembleDebug --stacktrace --no-parallel
+      
+    - name: 检查APK文件
+      run: |
+        find . -name "*.apk" -type f
+        ls -la app/build/outputs/apk/debug/ || echo "debug目录不存在"
+        
+    - name: 上传APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: 录音转文字-终极版
+        path: app/build/outputs/apk/debug/*.apk
+        retention-days: 30 
