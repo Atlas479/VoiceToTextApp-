@@ -1,0 +1,237 @@
+name: 构建Android APK (修复版)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 设置JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 设置Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 33
+        build-tools: 33.0.2
+        
+    - name: 创建local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: 检查项目结构
+      run: |
+        echo "=== 项目文件结构 ==="
+        ls -la
+        echo "=== app目录 ==="
+        ls -la app/ || echo "app目录不存在"
+        echo "=== gradle wrapper ==="
+        ls -la gradle/wrapper/ || echo "gradle wrapper不存在"
+        
+    - name: 验证gradle wrapper文件
+      run: |
+        if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+          echo "❌ gradle-wrapper.jar不存在，正在创建..."
+          mkdir -p gradle/wrapper
+          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+          
+          # 创建gradle-wrapper.properties
+          cat > gradle/wrapper/gradle-wrapper.properties << EOF
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip
+        networkTimeout=10000
+        validateDistributionUrl=true
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        EOF
+        else
+          echo "✅ gradle-wrapper.jar存在"
+          ls -la gradle/wrapper/gradle-wrapper.jar
+        fi
+        
+    - name: 验证gradlew脚本
+      run: |
+        if [ ! -f "gradlew" ]; then
+          echo "❌ gradlew脚本不存在，正在创建..."
+          cat > gradlew << 'EOF'
+        #!/bin/sh
+
+        # Gradle start up script for UN*X
+
+        # Attempt to set APP_HOME
+        # Resolve links: $0 may be a link
+        PRG="$0"
+        # Need this for relative symlinks.
+        while [ -h "$PRG" ] ; do
+            ls=`ls -ld "$PRG"`
+            link=`expr "$ls" : '.*-> \(.*\)$'`
+            if expr "$link" : '/.*' > /dev/null; then
+                PRG="$link"
+            else
+                PRG=`dirname "$PRG"`"/$link"
+            fi
+        done
+        SAVED="`pwd`"
+        cd "`dirname \"$PRG\"`/" >/dev/null
+        APP_HOME="`pwd -P`"
+        cd "$SAVED" >/dev/null
+
+        APP_NAME="Gradle"
+        APP_BASE_NAME=`basename "$0"`
+
+        # Use the maximum available, or set MAX_FD != -1 to use that value.
+        MAX_FD="maximum"
+
+        warn ( ) {
+            echo "$*"
+        }
+
+        die ( ) {
+            echo
+            echo "$*"
+            echo
+            exit 1
+        }
+
+        # OS specific support (must be 'true' or 'false').
+        cygwin=false
+        msys=false
+        darwin=false
+        case "`uname`" in
+          CYGWIN* )
+            cygwin=true
+            ;;
+          Darwin* )
+            darwin=true
+            ;;
+          MINGW* )
+            msys=true
+            ;;
+        esac
+
+        # For Cygwin, ensure paths are in UNIX format before anything is touched.
+        if $cygwin ; then
+            [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+        fi
+
+        # Attempt to set ANDROID_HOME
+        if [ -z "$ANDROID_HOME" ] ; then
+            if [ -d "/opt/android-sdk-linux" ] ; then
+                export ANDROID_HOME="/opt/android-sdk-linux"
+            fi
+        fi
+
+        # Classpath module
+        CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+        # Determine the Java command to use to start the JVM.
+        if [ -n "$JAVA_HOME" ] ; then
+            if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+                # IBM's JDK on AIX uses strange locations for the executables
+                JAVACMD="$JAVA_HOME/jre/sh/java"
+            else
+                JAVACMD="$JAVA_HOME/bin/java"
+            fi
+            if [ ! -x "$JAVACMD" ] ; then
+                die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+        Please set the JAVA_HOME variable in your environment to match the
+        location of your Java installation."
+            fi
+        else
+            JAVACMD="java"
+            which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+        Please set the JAVA_HOME variable in your environment to match the
+        location of your Java installation."
+        fi
+
+        # Increase the maximum file descriptors if we can.
+        if [ "$cygwin" = "false" -a "$darwin" = "false" ] ; then
+            MAX_FD_LIMIT=`ulimit -H -n`
+            if [ $? -eq 0 ] ; then
+                if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
+                    MAX_FD="$MAX_FD_LIMIT"
+                fi
+                ulimit -n $MAX_FD
+                if [ $? -ne 0 ] ; then
+                    warn "Could not set maximum file descriptor limit: $MAX_FD"
+                fi
+            else
+                warn "Could not query maximum file descriptor limit: $MAX_FD_LIMIT"
+            fi
+        fi
+
+        # For Darwin, add options to specify how the application appears in the dock
+        if [ "$darwin" = "true" ]; then
+            GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
+        fi
+
+        # For Cygwin, switch paths to Windows format before running java
+        if $cygwin ; then
+            APP_HOME=`cygpath --path --mixed "$APP_HOME"`
+            CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
+        fi
+
+        exec "$JAVACMD" $GRADLE_OPTS -classpath "$CLASSPATH" org.gradle.wrapper.GradleWrapperMain "$@"
+        EOF
+        else
+          echo "✅ gradlew脚本存在"
+        fi
+        
+    - name: 设置Gradle权限
+      run: chmod +x gradlew
+      
+    - name: 验证环境
+      run: |
+        echo "=== Java版本 ==="
+        java -version
+        echo "=== Android SDK ==="
+        echo "ANDROID_HOME: $ANDROID_HOME"
+        ls -la $ANDROID_HOME || echo "Android SDK目录不存在"
+        echo "=== Gradle Wrapper ==="
+        ./gradlew --version
+        
+    - name: 清理并构建Debug APK
+      run: |
+        echo "开始构建APK..."
+        ./gradlew clean
+        ./gradlew assembleDebug --no-daemon --stacktrace --info
+        
+    - name: 检查构建结果
+      run: |
+        echo "=== 检查APK文件 ==="
+        find . -name "*.apk" -type f
+        ls -la app/build/outputs/apk/debug/ || echo "debug目录不存在"
+        
+    - name: 上传Debug APK
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: 课程录音转文字-debug-修复版
+        path: app/build/outputs/apk/debug/*.apk
+        retention-days: 30
+        
+    - name: 构建Release APK (可选)
+      run: ./gradlew assembleRelease --no-daemon --stacktrace
+      continue-on-error: true
+      
+    - name: 上传Release APK
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: 课程录音转文字-release-修复版
+        path: app/build/outputs/apk/release/*.apk
+        retention-days: 30 

@@ -1,0 +1,43 @@
+# Android构建文件
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 临时文件
+temp/
+*.tmp
+*.temp
+
+# JDK临时文件
+jdk-*/
+
+# 日志文件
+*.log
+
+# APK文件（可选，如果不想提交APK）
+*.apk
+*.aab
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# IDE文件
+.vscode/
+.idea/
+
+# Gradle Wrapper（保留）
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties 
