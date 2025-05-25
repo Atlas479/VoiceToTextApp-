@@ -1,0 +1,51 @@
+name: 终极最终构建APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: 设置JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: 设置环境变量
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+        echo "PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_ENV
+        
+    - name: 验证环境
+      run: |
+        echo "Java版本:"
+        java -version
+        echo "JAVA_HOME: $JAVA_HOME"
+        echo "ANDROID_HOME: $ANDROID_HOME"
+        
+    - name: 创建gradle.properties
+      run: |
+        echo "org.gradle.jvmargs=-Xmx2048m" > gradle.properties
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "org.gradle.java.home=$JAVA_HOME" >> gradle.properties
+        
+    - name: 给gradlew权限
+      run: chmod +x gradlew
+      
+    - name: 清理项目
+      run: ./gradlew clean --no-daemon --stacktrace
+      
+    - name: 构建APK
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
+      
+    - name: 上传APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: 录音转文字-终极最终版
+        path: app/build/outputs/apk/debug/*.apk 
